@@ -54,7 +54,7 @@ function Sudoku(){
 
     useEffect(() => {
         if (puzzleFilled){
-            console.log("puzzle filled: " + puzzleFilled);
+           // console.log("puzzle filled: " + puzzleFilled);
             solvePuzzle();
         }
     
@@ -79,7 +79,7 @@ function Sudoku(){
         for (let i = 0; i < 81; i++){
             pieceTaken[i] = 0;
         }
-        for (let i = 0; i < 24; i++){            
+        for (let i = 0; i < 21; i++){            
         var randPieceNum = Math.floor(Math.random()*81+1); //finds random piece out of 81 pieces
         while (pieceTaken[randPieceNum]) {
             if (!pieceTaken[randPieceNum]) {
@@ -111,18 +111,18 @@ function Sudoku(){
                 do {
                     if (numberTried[randNum]){
                         randNum = Math.floor(Math.random()*9+1);
-                        console.log(numberTried);
+                       // console.log(numberTried);
                         numberTried[randNum-1] = 1;
                         triedAllNumbers = allNumbersTried(numberTried);
                     } 
                 } while (numberTried[randNum] && !triedAllNumbers);
             }
-            console.log(triedAllNumbers);
+            //console.log(triedAllNumbers);
         } while (!validPlacement && !triedAllNumbers);
         
-        console.log(`i: ${i} randNum ${randNum} randIndex: ${randPieceNum}: ${row} ${col}`);
+        //console.log(`i: ${i} randNum ${randNum} randIndex: ${randPieceNum}: ${row} ${col}`);
         var randPiece = document.getElementById(randPieceNum);
-        console.log(randPiece);
+       // console.log(randPiece);
         try {
             if (validPlacement){
             randPiece.innerHTML = randNum;
@@ -152,7 +152,7 @@ function Sudoku(){
          var puzzlePossibilities = fillPossibilities(puzzleArray);
         for (let i = 0; i < 9; i++){
             for (let j = 0; j < 9; j++){
-                console.log(i,j);
+               // console.log(i,j);
                 if (puzzlePossibilities[i][j] != undefined){
                     //console.log("check : ", puzzlePossibilities[i][j]);
                     var a = document.getElementById(i*9+j+1);
@@ -166,7 +166,7 @@ function Sudoku(){
                         miniSquares[k] = document.createElement('div');
                         var p = document.createElement('p');
                         if (puzzlePossibilities[i][j].includes(m*3+k+1)){
-                            console.log("found possibility ",(3*m+k+1));
+                           // console.log("found possibility ",(3*m+k+1));
                             p.innerHTML = 3*m+k+1;
                         }
                         p.setAttribute("class", "mini");
@@ -176,35 +176,20 @@ function Sudoku(){
                     }
                     a.appendChild(squareHtml[m]);
                     }
-                    console.log(a);
+                    //console.log(a);
                 }
             }
         }
-
-        //var a = document.getElementById(-(i*9+j+1));
-                    // var squareHtml = new Array(3);
-                    // var miniSquares = new Array(3);
-                    // for (let m = 0; m < 3; m++){
-                    // for (let k = 0; k < 3; k++){
-                    //     //<div className='miniSquare'></div>
-                    //     miniSquares[k] = <div key={m*3+k} className='miniSquare'>
-                    //         <p className='mini'>2</p>
-                    //     </div>
-                    // }
-                    // squareHtml[m] = <div key={m} className='miniBoard'>{miniSquares}</div>
-                    // //a.appendChild(squareHtml[m]);
-                    // }
-                    //var a = document.getElementById(-5);
-                    
-                    //setPuzzlePossibilities(squareHtml);
     }
 
     //console.log(hardest);
     return (
         <div>
-        <h2 className='difficulty'>{difficulty === "Hardest" ? <>Difficulty: Hardest 🧠!</> : <>Difficulty: {difficulty}</>} </h2>
+        <h2 className='difficulty' >{difficulty === "Hardest" ? <>Difficulty: Hardest 🧠!</> : <>Difficulty: {difficulty}</>} </h2>
         {puzzleBoard}
-        <div id={999}></div>
+        <p classname='status' id={1000}></p> 
+        <h2 className='status'>Note: puzzle may not be solvable due to pattern being randomly generated</h2>
+        <h2 className='status'>Currently no user interface. Need more time to develop</h2>
         </div>
     );
 }

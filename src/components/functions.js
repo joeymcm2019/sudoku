@@ -36,7 +36,7 @@ function validOption(puzzleArray, row, col, numToAdd){
     }
     var gridIndex3by3 = get3by3squareIndex(row,col);
     var {baseRow, baseCol} = getSquareBaseIndex(gridIndex3by3);
-    console.log(baseRow, baseCol);
+   // console.log(baseRow, baseCol);
     for (let i = 0; i < 3; i++) { //checking 3by3 grid
         for (let j = 0; j < 3; j++) {
             if (!((baseRow+i === row) && (baseCol + j === col))) { 
@@ -114,13 +114,13 @@ function fillPossibilities(puzzleArray){
                 if (a != undefined) {
                     if (a.innerHTML === "") {
                         //console.log(i);
-                        console.log("working on blank space", i, j);
+                       // console.log("working on blank space", i, j);
                         // puzzlePossibilities[row][col] = new Array(puzzleSize);
                         puzzlePossibilities[i][j] = fillSquarePossibilities(puzzleArray, i, j);
                     }
                 }
             } catch (error) {
-                console.log("error: row, col:", i, j);
+                //console.log("error: row, col:", i, j);
             }
 
         }
@@ -131,7 +131,7 @@ function fillPossibilities(puzzleArray){
 export {fillPossibilities};
 
 function fillSquarePossibilities(puzzleArray, row, col){
-    console.log("filling: ", row, col);
+    //console.log("filling: ", row, col);
     var squarePossibilities = "";
     for (let i = 1; i <= 9; i++){
         if (validOption(puzzleArray, row, col, i)){
@@ -140,6 +140,14 @@ function fillSquarePossibilities(puzzleArray, row, col){
             
         }
     }
-    console.log("square poss: " + squarePossibilities);
+   // console.log("square poss: " + squarePossibilities);
+    if (squarePossibilities === ""){
+        console.log("no possibilities");
+        var header = document.getElementById(1000);
+        var msg = document.createElement('p');
+        msg.setAttribute("class", "status")
+        msg.innerHTML = `Found no possibilites for a square: row: ${row+1} col: ${col+1}. Recommend refreshing page`;
+        header.appendChild(msg);
+    }
     return squarePossibilities;
 }

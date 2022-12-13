@@ -103,3 +103,9 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+.status {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 400;
+}

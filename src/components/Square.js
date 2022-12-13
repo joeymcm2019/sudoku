@@ -31,11 +31,11 @@ function Square({position, row, col}){
         try {
             var a = e.target;
             if (a.parentNode.attributes.name.value === "squareDiv"){
-                console.log("yeah baby");  
+                //console.log("yeah baby");  
             } else {
                 a = e.target.children.item("id");
             }
-            console.log(a.innerHTML);
+          //  console.log(a.innerHTML);
             if (a.innerHTML === ""){ //blank square.
                 //console.log('yay');
             }
