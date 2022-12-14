@@ -13,41 +13,52 @@ const puzzleSize = 9;
 
 function Sudoku(){
 
-
     const [difficulty, setDifficulty] = useState(difficulties[hardest]);
     const [puzzleBoard, setPuzzleBoard] = useState([]);
     const [puzzleFilled, setPuzzleFilled] = useState(false);
     const [puzzleArray, setPuzzleArray] = useState([]); //for running calculations on puzzle;
     const [puzzlePossibilities, setPuzzlePossibilities] = useState([]);
+    const [tests, setTests] = useState(0);
+    const [numberTest, setNumberTest] = useState(0);
 
     useEffect(() => {
         const n = puzzleSize;
-        let puzzlePieces = new Array(n);
-        let puzzleHTML = new Array(n);
-        for (let i = 0; i < 9; i++){
-            puzzlePieces[i] = new Array(n);
-            
-            for (let j = 0; j < 9; j++){
-                puzzlePieces[i][j] = <Square key={i*9+j} position={(i)*9+j+1} row={i+1} col={j+1}/>;
-            }
-            puzzleHTML[i] = <div className='puzzleBoard' name="puzzleDiv" key={(i+1)*100}>{puzzlePieces[i]}</div>;
-        }
-        setPuzzleBoard(puzzleHTML);
-
         let puzzleArrayTemp = new Array(n);
-        for (let i = 0; i < 9; i++){
+        for (let i = 0; i < n; i++){
             puzzleArrayTemp[i] = new Array(n);
-            for (let j = 0; j < 9; j++){
+            for (let j = 0; j < n; j++){
                 puzzleArrayTemp[i][j] = -1; //initial value;
             }
         }
         setPuzzleArray(puzzleArrayTemp);
     }, []);
 
+    
+    useEffect(() => {
+        if (puzzleArray != "" && !puzzleFilled){
+            createGrid();
+        }
+    }, [puzzleArray])
+
+    const createGrid = () => {
+        const n = puzzleSize;
+        let puzzlePieces = new Array(n);
+        let puzzleHTML = new Array(n);
+        for (let i = 0; i < n; i++){
+            puzzlePieces[i] = new Array(n);
+            for (let j = 0; j < n; j++){
+                puzzlePieces[i][j] = <Square key={i*9+j} number={puzzleArray[i][j]} position={(i)*9+j+1} row={i+1} col={j+1}/>;
+            }
+            puzzleHTML[i] = <div className='puzzleBoard' name="puzzleDiv" key={(i+100)}>{puzzlePieces[i]}</div>;
+        }
+        setPuzzleBoard(puzzleHTML);
+    }
+
     useEffect(() => {
         if (puzzleBoard != "") {
             if (!puzzleFilled) {
                 fillPuzzle();
+                test();
             }
         }
     }, [puzzleBoard]);
@@ -182,12 +193,34 @@ function Sudoku(){
         }
     }
 
+    //test useState variable grid
+    const test = () =>{
+        if (tests < 1){
+            var i = 0;
+            var j = 0;
+            console.log("i: ", i+1, "j: ",j+1, "puzzle piece: ", puzzleArray[i][j]);
+            const newArray = puzzleArray;
+            newArray[i][j]=4;
+            setPuzzleArray(newArray);
+            console.log("updated array: ", puzzleArray);
+            setNumberTest(1);
+            setTests(1);
+            }
+           
+    }
+
+    useEffect(() => {
+        console.log(numberTest);
+    }, [numberTest])
+    ///if (puzzleArray != "" && tests < 1)
+    //test();
+
     //console.log(hardest);
     return (
         <div>
         <h2 className='difficulty' >{difficulty === "Hardest" ? <>Difficulty: Hardest 🧠!</> : <>Difficulty: {difficulty}</>} </h2>
         {puzzleBoard}
-        <p classname='status' id={1000}></p> 
+        <p className='status' id={1000}></p> 
         <h2 className='status'>Note: puzzle may not be solvable due to pattern being randomly generated</h2>
         <h2 className='status'>Currently no user interface. Need more time to develop</h2>
         </div>

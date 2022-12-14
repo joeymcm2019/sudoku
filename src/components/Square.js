@@ -19,14 +19,16 @@ const getClassNameString = (row, col) => {
 }
 
 
-function Square({position, row, col}){
+function Square({position, row, col, number}){
 
     const classNameString = 'square' + getClassNameString(row, col);
-    const [number, setNumber] = useState("");
+    const [currentNumber, setCurrentNumber] = useState(number);
 
     //Selects square when clicked on.
     //Two different cases. Clicks on div or clicks on number.
     const handleDivClick = (e) => {
+        console.log("number " + number);
+        setCurrentNumber(number);
         e.preventDefault();
         try {
             var a = e.target;
@@ -45,9 +47,16 @@ function Square({position, row, col}){
         }
     }
 
+
+    const changeNumber = () => {
+        console.log("change number");
+        setCurrentNumber(number);
+    }
+    console.log("number " + number);
+
     return (
         <div className={classNameString} onClick={handleDivClick} name="squareDiv" id={-position}>
-        <p className="numberDisplay" id={position}></p>
+        <p className="numberDisplay"  onInput={changeNumber} id={position}>{currentNumber != -1 && currentNumber}</p>
         </div>
     );
 }
