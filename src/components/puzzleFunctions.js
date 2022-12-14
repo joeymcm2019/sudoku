@@ -1,7 +1,9 @@
+import { set } from "lodash";
+
 const puzzleSize = 9;
 
 const errorChecks = false;
-const numberOptions = 9;
+const numberOfOptions = 9;
 // num >0
 function getRow(num){
     if (num === 0){
@@ -23,7 +25,9 @@ function getCol(num){
 
 export {getCol};
 
-function validOption(puzzleArray, row, col, numToAdd){
+function validOption(numberArray, row, col, numToAdd){
+    //numToAdd = Math.floor(Math.random()*9+1);
+    //console.log("umm: ",  numberArray,row, col, numToAdd);
     if (puzzleSize === 1){
         return true;
     }
@@ -33,21 +37,22 @@ function validOption(puzzleArray, row, col, numToAdd){
     //console.log("uhhhhhh");
     var validplacement = true;
     const n = puzzleSize;
-    if (col > puzzleSize || row > puzzleSize){
-        if (errorChecks){
-        console.log("out of bounds: ", col, row);
+    if (errorChecks) {
+        if (col > puzzleSize || row > puzzleSize) {
+            console.log("out of bounds: ", col, row);
+            return false;
         }
-        return false;
     }
+
     for (let i = 0; i < n; i++){
         if (i != col){
-            if (puzzleArray[row][i] === numToAdd){
+            if (numberArray[row][i] === numToAdd){
                 //console.log("invalid placement")
                 return false;
             }
         }
         if (i != row){
-            if (puzzleArray[i][col] === numToAdd){
+            if (numberArray[i][col] === numToAdd){
                 //console.log("invalid placement");
                 return false;
             }
@@ -57,7 +62,7 @@ function validOption(puzzleArray, row, col, numToAdd){
     if (puzzleSize%3 != 0){
         console.log("bad puzzle size");
         return false;
-    } else {
+    } else { //3by3 grid checks
         
         var gridIndex3by3 = get3by3squareIndex(row,col);
         var {baseRow, baseCol}  = getSquareBaseIndex(gridIndex3by3);
@@ -72,7 +77,7 @@ function validOption(puzzleArray, row, col, numToAdd){
         for (let i = 0; i < 3; i++) { //checking 3by3 grid
             for (let j = 0; j < 3; j++) {
                 if (!((baseRow + i === row) && (baseCol + j === col))) {
-                    if (puzzleArray[baseRow + i][baseCol + j] === numToAdd) {
+                    if (numberArray[baseRow + i][baseCol + j] === numToAdd) {
                         //console.log("invalid placement");
                         return false;
                     }
@@ -81,10 +86,25 @@ function validOption(puzzleArray, row, col, numToAdd){
         }
     } 
 
+    var possibilites;
+    numberArray[row][col] = numToAdd;
+    try { possibilites = fillPossibilities(numberArray)
+    } catch (impossibleError){
+        numberArray[row][col] = -1;
+        return false;
+    }
+
+    // if (!leavesGridOptions(possibilites,numToAdd, row, col)){
+    //     return false;
+    // }
+
+    
     return validplacement;
+
 
 }
 
+//returns 0-8
 function get3by3squareIndex(row,col){
     return (Math.floor(row/3)*3+Math.floor((col)/3));
 }
@@ -142,17 +162,46 @@ function fillPossibilities(numberArray){
     if (n === 1){
         return null;
     }
+    
     var puzzlePossibilities = new Array(puzzleSize);
     for (let i = 0; i < n; i++) {
         puzzlePossibilities[i] = new Array(puzzleSize);
         for (let j = 0; j < n; j++) {
             if (numberArray[i][j] === -1) {
-                puzzlePossibilities[i][j] = fillSquarePossibilities(numberArray, i, j);
+                var temp = fillSquarePossibilities(numberArray, i, j);
+                //check for error: no possibilites means puzzle is unsolvable
+                if (temp != null){ 
+                puzzlePossibilities[i][j] = temp;
+                } else { //no possibility found. Throw error. 
+                    var unSolvableError = {
+                        badRow: i,
+                        badCol: j
+                    }
+                   // console.log("unsolvable puzzle error");
+                    throw (error) => {
+                        return unSolvableError;
+                    }
+                }
+
             } else {
                 puzzlePossibilities[i][j] = "";
             }
         }
     }
+
+    //check for broken puzzle
+    // if (puzzleIsBroken(puzzlePossibilities)){
+    //     console.log("uniqueness break: ", i, j);
+    //     var unSolvableError = {
+    //         badRow: i,
+    //         badCol: j
+    //     }
+    //    // console.log("unsolvable puzzle error");
+    //     throw (error) => {
+    //         return unSolvableError;
+    //     }
+    // }
+
     return puzzlePossibilities;
 }
 
@@ -161,10 +210,10 @@ export {fillPossibilities};
 function fillSquarePossibilities(numberArray, row, col){
     //console.log("filling: ", row, col);
     var squarePossibilities = "";
-    const n = numberOptions;
+    const n = numberOfOptions;
     for (let i = 1; i <= n; i++){
         if (errorChecks){
-        console.log("row: ", row, " col: ", col);
+       // console.log("row: ", row, " col: ", col);
     }
         if (validOption(numberArray, row, col, i)){
             squarePossibilities += i + " ";
@@ -172,12 +221,98 @@ function fillSquarePossibilities(numberArray, row, col){
     }
    // console.log("square poss: " + squarePossibilities);
     if (squarePossibilities === ""){
-        console.log("no possibilities");
-        var header = document.getElementById(1000);
-        var msg = document.createElement('p');
-        msg.setAttribute("class", "status")
-        msg.innerHTML = `Found no possibilites for a square: row: ${row+1} col: ${col+1}. Recommend refreshing page`;
-        header.appendChild(msg);
+        //console.log("no possibilities");
+        return null;
+      //  var header = document.getElementById(1000);
+      //  var msg = document.createElement('p');
+      //  msg.setAttribute("class", "status")
+      //  msg.innerHTML = `Found no possibilites for a square: row: ${row+1} col: ${col+1}. Recommend refreshing page`;
+      //  header.appendChild(msg);
     }
+
+
     return squarePossibilities;
+}
+
+//Can it be beat?
+function isSolvable(possibilities){
+    for (let i = 0; i < puzzleSize; i++){
+        for (let j = 0; j < puzzleSize; j++){
+
+        }
+    }
+}
+
+//break conditions:
+// one number is only option for multiple spaces where a rule for uniqueness applies: row col, 3by3 grid.
+// a given choice removes all possibilities for a given number somewhere where rules apply.
+// need to see if choice removes last remaining possibilies.
+
+//need to check rows cols, 3by3 grids for broken condition
+//I think I already have rows and cols for the most part
+
+
+//If all unused numbers are possible in 3by3 grid, return true. 
+function allAvailableNumbersArePossibleIn3by3Grids(possibilities){
+
+}
+
+
+
+
+//1. choose random piece to fill with random number
+//2. check if that number will create a contradiction by seeing if there will be no possibilities for a square
+//3. 
+
+//returns false if choice removes last remaining possibities for number in affected grids
+function leavesGridOptions(possibilities, numToAdd, row, col){
+    var gridIndex3by3 = get3by3squareIndex(row,col); //1-9
+    var {baseRow, baseCol}  = getSquareBaseIndex(gridIndex3by3);
+}
+
+export default leavesGridOptions;
+
+
+
+//Pretty cool algorithm.
+
+// function hasUniqueNessProblem(possilities){
+//     var broken = false;
+//     //uniquenessTestRowsColumns
+//     var uniqueChoicesForRows = new Array(numberOfOptions).fill(0);
+//     var uniqueChoicesForColumns = new Array(numberOfOptions).fill(0);
+//     var holesToFillForRows = new Array(numberOfOptions).fill(puzzleSize);
+//     var holesToFillForCols = new Array(numberOfOptions).fill(puzzleSize);
+//     for (let i = 0; i < puzzleSize; i++){
+//        //  uniqueChoicesForRows[i] = new Array(numberOfOptions).fill(0);
+//         // uniqueChoicesForColumns[i] = new Array(numberOfOptions).fill(0);
+//         for (let j = 0; j < puzzleSize; j++){
+//             if (possilities[i][j] != '') { //make sure square isn't filled
+//                 for (let k = 0; k < puzzleSize; k++) {
+//                     if (possilities[i][j].includes(k)) {
+//                        uniqueChoicesForRows[i]++;
+//                        uniqueChoicesForColumns[j]++;
+//                     }
+//                 }
+//             } else {
+//                 holesToFillForRows[i]--;
+//                 holesToFillForCols[j]--;
+//             }
+//         }   
+//     }
+//     for (let i = 0; i < puzzleSize; i++){
+//         if (uniqueChoicesForRows[i] < holesToFillForRows[i]){
+//             console.log("not enough unique options on row: ", row);
+//             return false;
+//         }
+//         if (uniqueChoicesForColumns[i] < holesToFillForCols){
+//             console.log("not enough unique options on col: ", col);
+//             return false;
+//         }
+//     }
+// }
+
+function puzzleIsBroken(possibilities){
+    var broken = false;
+    broken = !isSolvable(possibilities);
 }

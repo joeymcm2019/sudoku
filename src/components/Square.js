@@ -21,18 +21,21 @@ const getClassNameString = (row, col) => {
 
 const renderChecks = false;
 
-function Square({position, row, col, number, possiblities}){
+function Square({row, col, number, possiblities, isStarterPiece}){
 
     var classNameString = 'square' + getClassNameString(row, col);
     //Selects square when clicked on.
     //Two different cases. Clicks on div or clicks on number.
     const handleDivClick = (e) => {
-        console.log("number " + number);
         e.preventDefault();
+        if (isStarterPiece){
+            console.log("starter piece");
+        }
 
     }
 
     const [addMiniBoard, setAddMiniBoard] = useState(false);
+    const [startPiece, setStartPiece] = useState(isStarterPiece);
 
     const changeNumber = () => {
         console.log("change number");
@@ -55,8 +58,8 @@ function Square({position, row, col, number, possiblities}){
     }, [number]);
 
     return (
-        <div className={classNameString} onClick={handleDivClick} name="squareDiv" id={-position}>
-        <p className="numberDisplay" id={position} onChange={changeNumber} value={number}>{number != -1 && number}</p>
+        <div className={classNameString} onClick={handleDivClick} name="squareDiv">
+        <p className="numberDisplay">{number != -1 && number}</p>
         {addMiniBoard === true && <Miniboard numberArray={possiblities}/>}
         </div>
     );

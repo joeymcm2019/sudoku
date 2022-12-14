@@ -5,7 +5,7 @@ function fillIn(numberToFill, numberArray){
   //  console.log(numberToFill);
    // console.log(numberArray);
    if (numberArray === undefined){
-    console.log("Undefined number array");
+   // console.log("Undefined number array");
     return -1;
    }
      if (numberArray.includes(numberToFill)){

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Square from './Square';
 import {getRow, getCol, validOption, fillPossibilities} from "./puzzleFunctions";
 import { fill, set } from 'lodash';
+import { use } from 'passport';
 
 
 const {easy, medium, hard, hardest} = {easy: 0, medium: 1, hard: 2,hardest: 3};
@@ -10,6 +11,7 @@ const puzzleSize = 9;
 const numberOptions = 9;
 const errorChecks = false;
 
+var calls = 0;
 
 
 function Sudoku(){
@@ -18,6 +20,8 @@ function Sudoku(){
 
 
     const [difficulty, setDifficulty] = useState(difficulties[hardest]);
+
+    const[puzzleStarted, setPuzzleStarted] = useState(false);
 
     //for running calculations on puzzle;
     //filled in spaces from puzzle
@@ -86,7 +90,7 @@ function Sudoku(){
         const n = puzzleSize;
         var minNumbersToFill = n*2;
         if (n === 9){
-            minNumbersToFill = 23;
+            minNumbersToFill = 35;
         }
         var pieceTaken = new Array(n*n);
         for (let i = 0; i < n*n; i++) {
@@ -107,50 +111,67 @@ function Sudoku(){
                 pieceTaken[randPieceNum] = 1;
             }
 
-            var numberTried = new Array(numberOptions).fill(0);
+            var numbersTried = new Array(numberOptions).fill(0);
             //console.log(numberTried);
             var randNum = Math.floor(Math.random() * numberOptions + 1);
-            numberTried[randNum - 1] = 1;
+            numbersTried[randNum - 1] = 1;
             var row = getRow(randPieceNum);
             var col = getCol(randPieceNum);
-            if (errorChecks){
-            console.log("fillSquares random: randomSquare: ", randPieceNum,  "row: ", row, " col: ", col);
+            if (true){
+          //  console.log("fillSquares random: randomSquare: ", randPieceNum,  "row: ", row, " col: ", col);
             }
             var validPlacement = false;
             var triedAllNumbers = false;
             do {
-                validPlacement = validOption(numberArray, row, col, randNum)
+                
+                validPlacement = validOption(numberArray, row, col, randNum, calls);
+                console.log("calls: ", calls);
+                
                 if (validPlacement) {
                     numberArray[row][col] = randNum;
+                    console.log("umm: ", row, col, randNum);
                 } else {
                     randNum = Math.floor(Math.random() * numberOptions + 1);
                     do {
-                        if (numberTried[randNum]) {
+                        if (numbersTried[randNum]) {
                             randNum = Math.floor(Math.random() * numberOptions + 1);
                             ////console.log(numberTried);
-                            numberTried[randNum - 1] = 1;
-                            triedAllNumbers = allNumbersTried(numberTried);
+                            numbersTried[randNum - 1] = 1;
+                            triedAllNumbers = allNumbersTried(numbersTried);
                         }
-                    } while (numberTried[randNum] && !triedAllNumbers);
+                    } while (numbersTried[randNum] && !triedAllNumbers);
                 }
                 //console.log(triedAllNumbers);
             } while (!validPlacement && !triedAllNumbers);
 
+            if (triedAllNumbers && !validPlacement){
+                console.log("Something went wrong");
+            }
             //console.log(`i: ${i} randNum ${randNum} randIndex: ${randPieceNum}: ${row} ${col}`);
             ////console.log(randPiece);
-            numberArray[row][col] = randNum;
+            //numberArray[row][col] = randNum;
+            
         }
         //console.log("number array, just filled: ", numberArray);
         setNumberArray(numberArray);
         setNumberArrayFilled(true);
     }
 
+    const changeNumberArray = (badRow, badCol) => {
+        console.log("changing: ", badRow, badCol);
+    }
+
     useEffect(() => {
-        if (numberArrayFilled){
-        var possibilities = fillPossibilities(numberArray);
-       // console.log("possibilities", possibilities);
-        setPuzzlePossibilities(possibilities);
-        setPuzzlePossibilitiesFilled(true);
+        if (numberArrayFilled) {
+            try {
+            var possibilities = fillPossibilities(numberArray);
+            // console.log("possibilities", possibilities);
+            setPuzzlePossibilities(possibilities);
+            setPuzzlePossibilitiesFilled(true);
+            } catch (unSolvablePuzzleError){
+                const {badRow, badCol} = unSolvablePuzzleError();
+                changeNumberArray(badRow, badCol);
+            }
         }
     }, [numberArrayFilled]);
 
@@ -167,8 +188,17 @@ function Sudoku(){
             for (let i = 0; i < n; i++) {
                 puzzleArrayTemp[i] = new Array(n);
                 for (let j = 0; j < n; j++) {
-                    puzzleArrayTemp[i][j] = <Square key={i * n + j} number={numberArray[i][j]} 
-                    position={(i) * n + j + 1} row={i + 1} col={j + 1} possiblities={puzzlePossibilities[i][j]}/>;
+                    var isStarterPiece = (numberArray[i][j] != -1);
+
+                    puzzleArrayTemp[i][j] = 
+
+                    <Square key={i * n + j} 
+                            number={numberArray[i][j]}
+                            row={i + 1} 
+                            col={j + 1} 
+                            possiblities={puzzlePossibilities[i][j]}
+                            isStarterPiece={isStarterPiece}
+                    />;
                 }
             }
             setPuzzleArray(puzzleArrayTemp);
