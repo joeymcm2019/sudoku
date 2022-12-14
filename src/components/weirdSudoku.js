@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Square from './Square';
-import {getRow, getCol, validOption, fillPossibilities} from "./puzzleFunctionsNormal";
+import {getRow, getCol, validOption, fillPossibilities} from "./puzzleFunctions2";
 import { fill, set } from 'lodash';
 import { use } from 'passport';
 
@@ -9,12 +9,12 @@ const {easy, medium, hard, hardest} = {easy: 0, medium: 1, hard: 2,hardest: 3};
 const difficulties = ["Easy", "Medium", "Hard", "Hardest"];
 const puzzleSize = 9;
 const numberOptions = 9;
-
 const errorChecks = false;
 
+var calls = 0;
 
 
-function Sudoku(){
+function WeirdSudoku(){
 
 
 
@@ -86,11 +86,11 @@ function Sudoku(){
 
     //todo: make it so Math.random doesn't have to retry so many times. Only allow it to fill in valid values.
     //would have to map each random number to one of the valid options.
-    const fillPuzzle = () => {
+    const fillPuzzle = (recursion) => {
         const n = puzzleSize;
         var minNumbersToFill = n*2;
         if (n === 9){
-            minNumbersToFill = 24;
+            minNumbersToFill = 35;
         }
         var pieceTaken = new Array(n*n);
         for (let i = 0; i < n*n; i++) {
@@ -117,14 +117,15 @@ function Sudoku(){
             numbersTried[randNum - 1] = 1;
             var row = getRow(randPieceNum);
             var col = getCol(randPieceNum);
-            if (errorChecks){
+            if (true){
             console.log("fillSquares random: randomSquare: ", randPieceNum,  "row: ", row, " col: ", col);
             }
             var validPlacement = false;
             var triedAllNumbers = false;
             do {
                 try { 
-                    validPlacement = validOption(numberArray, row, col, randNum);
+                    validPlacement = validOption(numberArray, row, col, randNum, recursion);
+                    console.log("valid ?" ,validPlacement);
                 } catch (error){
                     validPlacement = false;
                     randNum = Math.floor(Math.random() * numberOptions + 1);
@@ -371,4 +372,4 @@ useEffect(() =>{
     );
 }
 
-export default Sudoku;
+export default WeirdSudoku;
