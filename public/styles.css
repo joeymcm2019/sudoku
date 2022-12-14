@@ -51,6 +51,10 @@ body {
   margin-block-start: -2px;
 }
 
+.starterSquare {
+  background-color: rgb(224, 224, 224);
+}
+
 
 
 .leftBlack {

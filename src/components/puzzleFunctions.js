@@ -1,26 +1,45 @@
 const puzzleSize = 9;
 
+const errorChecks = false;
+const numberOptions = 9;
 // num >0
 function getRow(num){
     if (num === 0){
         console.log("error: get row. num is 0");
     }
-    return Math.floor((num-1)/9);
+    if (errorChecks){
+        console.log("checking boundary: " + num);
+    }
+
+    return Math.floor((num-1)/puzzleSize);
 }
 
 export {getRow};
 
 function getCol(num){
     var row = getRow(num);
-    return num-row*9-1;
+    return num-row*puzzleSize-1;
 }
 
 export {getCol};
 
 function validOption(puzzleArray, row, col, numToAdd){
+    if (puzzleSize === 1){
+        return true;
+    }
+    // if (puzzleArray[row][col] != -1){
+    //     return false;
+    // }
     //console.log("uhhhhhh");
     var validplacement = true;
-    for (let i = 0; i < 9; i++){
+    const n = puzzleSize;
+    if (col > puzzleSize || row > puzzleSize){
+        if (errorChecks){
+        console.log("out of bounds: ", col, row);
+        }
+        return false;
+    }
+    for (let i = 0; i < n; i++){
         if (i != col){
             if (puzzleArray[row][i] === numToAdd){
                 //console.log("invalid placement")
@@ -34,19 +53,34 @@ function validOption(puzzleArray, row, col, numToAdd){
             }
         }
     }
-    var gridIndex3by3 = get3by3squareIndex(row,col);
-    var {baseRow, baseCol} = getSquareBaseIndex(gridIndex3by3);
-   // console.log(baseRow, baseCol);
-    for (let i = 0; i < 3; i++) { //checking 3by3 grid
-        for (let j = 0; j < 3; j++) {
-            if (!((baseRow+i === row) && (baseCol + j === col))) { 
-                if (puzzleArray[baseRow+i][baseCol+j] === numToAdd) {
-                    //console.log("invalid placement");
-                    return false;
+    
+    if (puzzleSize%3 != 0){
+        console.log("bad puzzle size");
+        return false;
+    } else {
+        
+        var gridIndex3by3 = get3by3squareIndex(row,col);
+        var {baseRow, baseCol}  = getSquareBaseIndex(gridIndex3by3);
+        if (puzzleSize === 1 || puzzleSize === 3){
+            baseRow = 0;
+            baseCol = 0;
+        }
+        // console.log(baseRow, baseCol);
+        if (n === 1){
+            return true;
+        }
+        for (let i = 0; i < 3; i++) { //checking 3by3 grid
+            for (let j = 0; j < 3; j++) {
+                if (!((baseRow + i === row) && (baseCol + j === col))) {
+                    if (puzzleArray[baseRow + i][baseCol + j] === numToAdd) {
+                        //console.log("invalid placement");
+                        return false;
+                    }
                 }
             }
         }
-    }
+    } 
+
     return validplacement;
 
 }
@@ -65,6 +99,7 @@ function get3by3squareIndex(row,col){
 //0 3 6
 //num 0-8
 function getSquareBaseIndex(num){
+    //const n = puzzleSize/3;
     var row = Math.floor(num/3)*3;
     var col = (num%3)*3;
     return {baseRow: row, baseCol: col}
@@ -101,28 +136,21 @@ console.log(get3by3squareIndex(6,6) === 8);
 
 export {validOption}
 
-function fillPossibilities(puzzleArray){
+function fillPossibilities(numberArray){
     //console.log("puzzle: !!!!!!!!!!!!!!!!!!!!!!!!!!!! " + puzzleArray);
+    const n = puzzleSize;
+    if (n === 1){
+        return null;
+    }
     var puzzlePossibilities = new Array(puzzleSize);
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < n; i++) {
         puzzlePossibilities[i] = new Array(puzzleSize);
-        for (let j = 0; j < 9; j++) {
-            
-            try {    
-                var a = document.getElementById(i*9+j+1);
-                // console.log("a: " + a);
-                if (a != undefined) {
-                    if (a.innerHTML === "") {
-                        //console.log(i);
-                       // console.log("working on blank space", i, j);
-                        // puzzlePossibilities[row][col] = new Array(puzzleSize);
-                        puzzlePossibilities[i][j] = fillSquarePossibilities(puzzleArray, i, j);
-                    }
-                }
-            } catch (error) {
-                //console.log("error: row, col:", i, j);
+        for (let j = 0; j < n; j++) {
+            if (numberArray[i][j] === -1) {
+                puzzlePossibilities[i][j] = fillSquarePossibilities(numberArray, i, j);
+            } else {
+                puzzlePossibilities[i][j] = "";
             }
-
         }
     }
     return puzzlePossibilities;
@@ -130,14 +158,16 @@ function fillPossibilities(puzzleArray){
 
 export {fillPossibilities};
 
-function fillSquarePossibilities(puzzleArray, row, col){
+function fillSquarePossibilities(numberArray, row, col){
     //console.log("filling: ", row, col);
     var squarePossibilities = "";
-    for (let i = 1; i <= 9; i++){
-        if (validOption(puzzleArray, row, col, i)){
-            
+    const n = numberOptions;
+    for (let i = 1; i <= n; i++){
+        if (errorChecks){
+        console.log("row: ", row, " col: ", col);
+    }
+        if (validOption(numberArray, row, col, i)){
             squarePossibilities += i + " ";
-            
         }
     }
    // console.log("square poss: " + squarePossibilities);

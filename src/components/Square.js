@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Possiblities from './Possibilities';
+import Miniboard from './Miniboard';
 
 const getClassNameString = (row, col) => {
     var addOn = "";
@@ -18,45 +19,45 @@ const getClassNameString = (row, col) => {
     return addOn;
 }
 
+const renderChecks = false;
 
-function Square({position, row, col, number}){
+function Square({position, row, col, number, possiblities}){
 
-    const classNameString = 'square' + getClassNameString(row, col);
-    const [currentNumber, setCurrentNumber] = useState(number);
-
+    var classNameString = 'square' + getClassNameString(row, col);
     //Selects square when clicked on.
     //Two different cases. Clicks on div or clicks on number.
     const handleDivClick = (e) => {
         console.log("number " + number);
-        setCurrentNumber(number);
         e.preventDefault();
-        try {
-            var a = e.target;
-            if (a.parentNode.attributes.name.value === "squareDiv"){
-                //console.log("yeah baby");  
-            } else {
-                a = e.target.children.item("id");
-            }
-          //  console.log(a.innerHTML);
-            if (a.innerHTML === ""){ //blank square.
-                //console.log('yay');
-            }
-            //square successfully selected
-        } catch(err){
-            console.log(err);
-        }
+
     }
 
+    const [addMiniBoard, setAddMiniBoard] = useState(false);
 
     const changeNumber = () => {
         console.log("change number");
-        setCurrentNumber(number);
     }
-    console.log("number " + number);
+
+    //console.log("possibilites square: ", possiblities);
+    if (renderChecks){
+    console.log("number: ", number);
+    }
+
+    if (number != -1){
+        classNameString += " starterSquare";
+    }
+
+    useEffect(() => {
+        if (number === -1){
+            setAddMiniBoard(true);
+           // console.log("adding mini board: ",possiblities);
+        }
+    }, [number]);
 
     return (
         <div className={classNameString} onClick={handleDivClick} name="squareDiv" id={-position}>
-        <p className="numberDisplay"  onInput={changeNumber} id={position}>{currentNumber != -1 && currentNumber}</p>
+        <p className="numberDisplay" id={position} onChange={changeNumber} value={number}>{number != -1 && number}</p>
+        {addMiniBoard === true && <Miniboard numberArray={possiblities}/>}
         </div>
     );
 }

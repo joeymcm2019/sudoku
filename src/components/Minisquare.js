@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-function Minisquare() {
+
+function MiniSquare({number}) {
     return (
-        <div className='miniSquare'></div>
-    );
+        <div className='miniSquare'>
+        <p className='mini'>{number != -1 && number}</p>
+        </div>
+    )
 }
+
+export default MiniSquare;
