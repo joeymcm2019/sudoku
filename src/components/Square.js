@@ -30,16 +30,14 @@ function Square({row, col, number, possiblities, isStarterPiece}){
         e.preventDefault();
         if (isStarterPiece){
             console.log("starter piece");
+        } else {
+           // popUpMenu()
         }
-
     }
 
     const [addMiniBoard, setAddMiniBoard] = useState(false);
     const [startPiece, setStartPiece] = useState(isStarterPiece);
-
-    const changeNumber = () => {
-        console.log("change number");
-    }
+    const [options, setOptions] = useState(possiblities);
 
     //console.log("possibilites square: ", possiblities);
     if (renderChecks){
@@ -57,10 +55,17 @@ function Square({row, col, number, possiblities, isStarterPiece}){
         }
     }, [number]);
 
+    useEffect(() => {
+        if (setAddMiniBoard){
+       // possiblities = "1 2 3 4 5";
+        //console.log("changed poss");
+        }
+    }, [setAddMiniBoard])
+
     return (
         <div className={classNameString} onClick={handleDivClick} name="squareDiv">
         <p className="numberDisplay">{number != -1 && number}</p>
-        {addMiniBoard === true && <Miniboard numberArray={possiblities}/>}
+        {addMiniBoard === true && <Miniboard numberArray={options}/>}
         </div>
     );
 }

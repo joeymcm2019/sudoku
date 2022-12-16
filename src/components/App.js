@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Header from "./Header";
-import Sudoku from "./Sudoku";
+import Sudoku2 from "./Sudoku2";
 
 function App(){
 
@@ -10,7 +10,7 @@ function App(){
         <Header />
         </div>
         <div>
-        <Sudoku />
+        <Sudoku2 />
     </div>
     </div>
     )  

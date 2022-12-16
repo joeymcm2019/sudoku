@@ -43,7 +43,7 @@ function WeirdSudoku(){
     const [gridCreated, setGridCreated] = useState(false); 
 
     //testing variables
-    const [testing, setTesting] = useState(false);
+    const [testing, setTesting] = useState(true);
     const [tests, setTests] = useState(0);
   
     const [changingNumberArray, setChangingNumberArray] = useState(false);
