@@ -418,8 +418,8 @@ const getColPossibilities = () => {
     const handleClick = () => {
         console.log("prepare");
         console.log(puzzlePossibilities);
-        if (checkColTuplesWork(puzzlePossibilities)){
-            console.log("working col tups");
+        if (checkRowTuplesWork(puzzlePossibilities)){
+            console.log("working row tups");
            // colTuplesWork(puzzlePossibilities);  
            // console.log(puzzlePossibilities); 
         }
@@ -428,14 +428,13 @@ const getColPossibilities = () => {
     
     return (
         <div>
-            <h2 className='difficulty' >{difficulty === "Hardest" ? <>Difficulty: Hardest 🧠!</> : <>Difficulty: {difficulty}</>} </h2>
+            {/* <h2 className='difficulty' >{difficulty === "Hardest" ? <>Difficulty: Hardest 🧠!</> : <>Difficulty: {difficulty}</>} </h2> */}
             {puzzleBoard}
-            <p className='status' id={1000}></p>
             <h2 className='status'>Note: puzzle may not be solvable due to pattern being randomly generated</h2>
             <h2 className='status'>Currently no user interface. Need more time to develop</h2>
             <div className='puzzleBoard'>
             <div className='square' onClick={handleClick}>
-                <p>Solve</p>
+                <p>Test</p>
             </div>
             </div>
         </div>

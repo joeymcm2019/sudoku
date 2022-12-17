@@ -449,27 +449,27 @@ function rowTuplesWork(possibilityGrid) {
 
     var rowTuple, rowTupleCount, rowTupleDigits;
     var rowTupleIndexes = ""; //track indexes where we have a certain tuple
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            if (possibilityGrid[i][j] != "filled" && possibilityGrid[i][j] != "") {
-                rowTuple = possibilityGrid[i][j]
+    for (let row = 0; row < 9; row++) {
+        var rowPossibilities = getRowPossibilities(possibilityGrid, row);
+        for (let col = 0; col < 9; col++) {
+            if (possibilityGrid[row][col] != "filled" && possibilityGrid[row][col] != "") {
+                rowTuple = possibilityGrid[row][j]
                 rowTupleDigits = getTupleDigits(rowTuple);
                 rowTupleCount = 1;
-                rowTupleIndexes = `${j}`;
+                rowTupleIndexes = `${col}`;
                 //console.log(rowTuple);
-                for (let k = j + 1; k < 9; k++) { //edge case [row][8] single pos not an issue.
-                    if (rowTuple === possibilityGrid[i][k]) {
+                for (let k = col + 1; k < 9; k++) { //edge case [row][8] single pos not an issue.
+                    if (rowTuple === possibilityGrid[row][col]) {
                         rowTupleCount++;
                         rowTupleIndexes += `${k}`;
                     }
                     // if (i === 0){
                     //    //console.log("check: ", rowTuple, i, j, possibilityGrid[i][j], rowTupleCount);
                     // } 
-                    if (rowTupleCount >= rowTuple.length && rowTupleCount < getRowPossibilities(possibilityGrid, i)) {
-                        // //console.log("found row tuple to exploit: ", "tuple: ", rowTuple, "count: ", rowTupleCount, "poss: ", rowPossibilities);
-                        try {
+                    if (rowTupleCount >= rowTuple.length && rowTupleCount < getRowPossibilities(possibilityGrid, row)) {
+                        console.log("found row tuple: ", rowTuple, "count: ", rowTupleCount, "poss: ", rowPossibilities, "row: ", row, "col: ", col);                        try {
                             rowTupleDigits.forEach((number) => {
-                                updatePossibilityGridRow(possibilityGrid, number, i, j, rowTupleIndexes);
+                                updatePossibilityGridRow(possibilityGrid, number, row, col, rowTupleIndexes);
                             });
 
                             ////console.log("huh ", i, j, possibilityGrid[i]);
@@ -576,18 +576,19 @@ export {checkColTuplesWork}
 
 
 function colTuplesWork(possibilityGrid) {
-    var colTuple, colTupleCount, colTupleDigits;
+   var colTuple, colTupleCount, colTupleDigits;
     var colTupleIndexes = ""; //track indexes where we have a certain tuple
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            if (possibilityGrid[i][j] != "filled" && possibilityGrid[i][j] != "") {
-                colTuple = possibilityGrid[i][j]
+    for (let col = 0; col < 9; col++) {
+        for (let row = 0; row < 9; row++) {
+            if (possibilityGrid[row][col] != "filled" && possibilityGrid[row][col] != "") {
+                
+                colTuple = possibilityGrid[row][col];
                 colTupleDigits = getTupleDigits(colTuple);
                 colTupleCount = 1;
-                colTupleIndexes = `${j}`;
+                colTupleIndexes = `${row}`;
                 //console.log(colTuple);
-                for (let k = j + 1; k < 9; k++) {
-                    if (colTuple === possibilityGrid[k][i]) {
+                for (let k = row + 1; k < 9; k++) {
+                    if (colTuple === possibilityGrid[k][col]) {
                         colTupleCount++;
                         colTupleIndexes += `${k}`;
                     }
@@ -595,16 +596,18 @@ function colTuplesWork(possibilityGrid) {
                     // if (i === 0){
                     //    //console.log("check: ", colTuple, i, j, possibilityGrid[i][j], colTupleCount);
                     // } 
-                    if (colTupleCount >= colTuple.length && colTupleCount < getColPossibilities(possibilityGrid,i)) {
+                    var colPossibilities = (getColPossibilities(possibilityGrid, col));
+                    if (colTupleCount >= colTuple.length && colTupleCount < colPossibilities) {
                         // //console.log("found col tuple to exploit: ", "tuple: ", colTuple, "count: ", colTupleCount, "poss: ", colPossibilities);
                         try {
                             colTupleDigits.forEach((number) => {
-                                console.log("found tuple", colTuple, "col: ", col, "Count: ", colTupleCount);
-                                updatePossibilityGridCol(possibilityGrid, number, i, j, colTupleIndexes)
+                                console.log("found tuple", colTuple, "col: ", col, "row: ", row, "Count: ", colTupleCount, "colPos: ", colPossibilities);
+                                updatePossibilityGridCol(possibilityGrid, number, row, col, colTupleIndexes)
                             });
 
                             ////console.log("huh ", i, j, possibilityGrid[i]);
                         } catch (impossibleError) {
+                            console.log("error in col tups");
                             //console.log("error colTulpes: i", i, "j: ", j, possibilityGrid[i], "indexes: ", colTupleIndexes);
                             return false;
                         }
@@ -641,9 +644,12 @@ function updateGridTuples(grid, numToAdd, row, col, indexPairs) {
     function updatePossibilityGridRow(possibilityGrid, numToAdd, row, col, tupleIndexes){
         //console.log("row: ", possibilityGrid[row])
         //possibilityGrid[row][col]
+        console.log("updating row, removing:", numToAdd,  " tupIndexs (do not remove from these cols): ", tupleIndexes);
         for (let i = 0; i < 9; i++){
+            console.log(tupleIndexes.includes(i), i, "index: ", tupleIndexes);
             if (!tupleIndexes.includes(i)) {
                 if (possibilityGrid[row][i] != "filled") { //will be blank if number is already placed on puzzleBoard
+                    console.log("used row tupple to make change: row", i, "col", col, "numRemoved: ", numToAdd)
                     possibilityGrid[row][i] = possibilityGrid[row][i].replace(`${numToAdd}`, '');
                     if (possibilityGrid[row][i] === "") {
                        //console.log("error location: ", row, i, possibilityGrid[row][i])
